@@ -1,0 +1,4 @@
+# Skip buildpacks and deploy as static content
+env:
+  - name: SKIP_BUILDPACK_DETECTION
+    value: "true"
