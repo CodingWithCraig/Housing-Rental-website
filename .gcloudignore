@@ -1,0 +1,13 @@
+# Skip all build processes
+*
+
+# But include these static files
+!*.html
+!*.css
+!*.js
+!*.jpg
+!*.jpeg
+!*.png
+!*.gif
+!*.ico
+!*.json
