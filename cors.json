@@ -1,0 +1,8 @@
+[
+  {
+    "origins": ["https://CodingWithCraig.github.io"],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "responseHeaders": ["Content-Type", "Authorization", "Content-Length", "User-Agent", "x-goog-resumable"],
+    "maxAgeSeconds": 3600
+  }
+]
