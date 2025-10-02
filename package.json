@@ -1,7 +1,8 @@
 {
   "name": "housing-rental-website",
   "version": "1.0.0",
+  "description": "Housing rental website with AWS Cognito authentication",
   "scripts": {
-    "build": "echo 'Build complete'"
+    "build": "echo 'Build complete - No build process needed for static site'"
   }
 }
