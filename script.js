@@ -1,3 +1,30 @@
+// Add at the top of script.js
+if (typeof AmazonCognitoIdentity === 'undefined') {
+    console.error('AWS Cognito SDK not loaded!');
+    // You might want to show a user-friendly message
+}
+
+// Your existing Cognito configuration
+const poolData = {
+    UserPoolId: 'eu-north-1_q761gVZ4i',
+    ClientId: '47e7h6lmcs682vgb14nf7mrkpf'
+};
+
+// Only initialize if SDK is available
+if (typeof AmazonCognitoIdentity !== 'undefined') {
+    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+    
+    // Rest of your signup/signin functions...
+} else {
+    console.error('Cognito SDK not available - check script loading');
+}
+
+
+
+
+
+
+
 // ---------------- AWS CONFIG ----------------
 // Fix: Region should match your Identity Pool region
 AWS.config.region = 'eu-north-1'; // Changed from us-east-1 to eu-north-1
@@ -157,3 +184,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
