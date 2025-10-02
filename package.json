@@ -1,0 +1,6 @@
+// package.json
+{
+  "scripts": {
+    "build": "npm run build" // or your framework's build command
+  }
+}
