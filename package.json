@@ -1,6 +1,7 @@
-// package.json
 {
+  "name": "housing-rental-website",
+  "version": "1.0.0",
   "scripts": {
-    "build": "npm run build" // or your framework's build command
+    "build": "echo 'Build complete'"
   }
 }
