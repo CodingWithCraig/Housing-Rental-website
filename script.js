@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
         card.innerHTML = `
             ${imagesHTML}
             <div class="rental-location">${property.location}</div>
-            <div class="rental-price">$${property.price}/month</div>
+            <div class="rental-price">R${property.price}/month</div>
             <div class="rental-description">${property.description}</div>
             <div class="rental-owner">Listed by: ${property.ownerEmail}</div>
         `;
@@ -480,3 +480,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('All functions loaded successfully!');
 });
+
