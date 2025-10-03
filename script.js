@@ -312,13 +312,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function createRentalCard(property) {
+        function createRentalCard(property) {
         const card = document.createElement('div');
         card.className = 'rental-card';
         
         let imagesHTML = '';
         if (property.imageUrls && property.imageUrls.length > 0) {
-            imagesHTML = `<img src="${property.imageUrls[0]}" alt="${property.location}" class="rental-image">`;
+            // Show first image as main image
+            imagesHTML = `
+                <div class="main-image">
+                    <img src="${property.imageUrls[0]}" alt="${property.location}" class="rental-image">
+                </div>
+            `;
+            
+            // Add image counter if there are multiple images
+            if (property.imageUrls.length > 1) {
+                imagesHTML += `
+                    <div class="image-counter">
+                        +${property.imageUrls.length - 1} more photos
+                    </div>
+                    <div class="all-images" style="display: none;">
+                        ${property.imageUrls.map(url => `<img src="${url}" alt="${property.location}" class="additional-image">`).join('')}
+                    </div>
+                    <button onclick="toggleImages(this)" class="view-photos-btn">View All Photos</button>
+                `;
+            }
         } else {
             imagesHTML = '<div class="no-images">No Images Available</div>';
         }
@@ -333,6 +351,25 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return card;
     }
+
+
+        window.toggleImages = function(button) {
+        const card = button.closest('.rental-card');
+        const allImages = card.querySelector('.all-images');
+        const mainImage = card.querySelector('.main-image');
+        
+        if (allImages.style.display === 'none') {
+            // Show all images
+            allImages.style.display = 'block';
+            mainImage.style.display = 'none';
+            button.textContent = 'Show Main Photo';
+        } else {
+            // Show only main image
+            allImages.style.display = 'none';
+            mainImage.style.display = 'block';
+            button.textContent = 'View All Photos';
+        }
+    };
 
     // ---------------- STORAGE FUNCTIONS ----------------
     async function uploadImageToS3(imageFile, propertyId) {
@@ -480,4 +517,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('All functions loaded successfully!');
 });
+
 
