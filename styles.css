@@ -1,3 +1,4 @@
+```css
 * {
     padding: 0;
     box-sizing: border-box;
@@ -11,6 +12,7 @@ body {
     align-content: center;
     width: 100%;
     text-align: center;
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .login-page {
@@ -28,7 +30,6 @@ body {
     padding: 50px;
     text-shadow: 8px 4px 2px black;
     margin-top: 100px;
-
 }
 
 .web-description {
@@ -92,26 +93,8 @@ button:hover {
     background-color: aliceblue;
 }
 
-
-@media (max-width: 600px) {
-    .guide {
-        margin-left: 13px;
-    }
-
-    .title {
-        margin-top: 85px;
-    }
-}
-
-
-
-
-
-/*Used for when i want to test my sites*/
-
-/* .login-page {
-    display: none;
-} */
+/* Used for when i want to test my sites */
+/* .login-page { display: none; } */
 
 /* Adding the background */
 .navigation-page {
@@ -121,7 +104,6 @@ button:hover {
     background-size: cover;
     height: 100vh;
 }
-
 
 .nav-list {
     height: 100vh;
@@ -140,9 +122,7 @@ button:hover {
     display: none;
 }
 
-
-/*Mark up Page*/
-
+/* Mark up Page */
 .help-page {
     background-image: url('background2.jpg');
     background-repeat: no-repeat;
@@ -170,8 +150,6 @@ button:hover {
     margin-top: 10px;
     font-weight: bold;
     font-size: 1.2rem;
-
-
 }
 
 .answers {
@@ -182,7 +160,7 @@ button:hover {
 
 .update {
     margin-top: 50px;
-    color:aliceblue;
+    color: aliceblue;
     background-color: black;
 }
 
@@ -211,12 +189,8 @@ a {
     display: none;
 }
 
-
-
-/*Becoming a landlord Page*/
-
+/* Becoming a landlord Page */
 .rental-submissions {
-
     background-image: url('background.jpg');
     background-position: center;
     background-repeat: no-repeat;
@@ -225,28 +199,23 @@ a {
 }
 
 .title3 {
-
     margin-top: 150px;
     font-size: 2rem;
-    color:white;
+    color: white;
     text-shadow: 2px 5px 4px rgb(55, 56, 0);
     padding: 7%;
-
 }
 
 .sub-content {
-
     width: 65%;
     margin-left: 18%;
     background-color: rgba(0, 0, 0, 0.884);
     color: aliceblue;
     border-radius: 10px;
-
 }
 
 .rental-submissions {
     display: none;
-
 }
 
 /* Verification Page */
@@ -281,8 +250,6 @@ a {
 .ver-background {
     background-color: red;
     border-radius: 20px;
-
-    
 }
 
 .btn-resend {
@@ -299,7 +266,6 @@ a {
     display: none;
 }
 
-```css
 /* View Rentals Page */
 .view-rentals-page {
     background: url('background.jpg') no-repeat center center / cover;
@@ -388,64 +354,6 @@ a {
     padding-top: 0.5rem;
 }
 
-/* --- Responsive Adjustments --- */
-
-/* Tablets (≤1024px) */
-@media (max-width: 1024px) {
-    .rentals-content {
-        padding: 1.5rem;
-    }
-    .rental-price {
-        font-size: 1.3rem;
-    }
-}
-
-/* Large Phones & Small Tablets (≤768px) */
-@media (max-width: 768px) {
-    .rentals-content {
-        padding: 1rem;
-    }
-    .rentals-list {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 1rem;
-    }
-    .rental-image,
-    .no-images {
-        height: 180px;
-    }
-    .rental-location {
-        font-size: 1.1rem;
-    }
-    .rental-price {
-        font-size: 1.2rem;
-    }
-}
-
-/* Mobile Phones (≤480px) */
-@media (max-width: 480px) {
-    .rentals-content {
-        padding: 0.75rem;
-    }
-    .rentals-list {
-        grid-template-columns: 1fr; /* one card per row */
-    }
-    .rental-image,
-    .no-images {
-        height: 150px;
-    }
-    .rental-location {
-        font-size: 1rem;
-    }
-    .rental-price {
-        font-size: 1.1rem;
-    }
-    .rental-description {
-        font-size: 0.9rem;
-    }
-}
-```
-
-
 /* Multiple Images Styles */
 .main-image {
     position: relative;
@@ -489,6 +397,62 @@ a {
     margin-bottom: 10px;
 }
 
+/* -------------------- MOBILE FIXES -------------------- */
+@media (max-width: 600px) {
+    .title {
+        font-size: 2.5rem;
+        margin-top: 60px;
+        padding: 20px;
+    }
 
+    .web-description {
+        width: 90%;
+        margin: 0 auto;
+        font-size: 0.9rem;
+        padding: 10px;
+    }
 
+    .guide {
+        width: 90%;
+        margin: 10px auto;
+        font-size: 1rem;
+        padding: 10px;
+    }
 
+    .mark-up, 
+    .sub-content, 
+    .mark-up2 {
+        width: 90% !important;
+        margin: 15px auto !important;
+    }
+
+    .title3 {
+        margin-top: 80px;
+        padding: 20px;
+        font-size: 1.5rem;
+    }
+
+    .verification-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .btn3, .btn4, .btn5, .btn6, .btn7 {
+        font-size: 1.5rem;
+        padding: 8px;
+        width: 90%;
+        margin: 10px auto;
+        display: block;
+    }
+
+    .rental-image,
+    .no-images,
+    .additional-image {
+        height: 150px;
+    }
+
+    .rentals-list {
+        grid-template-columns: 1fr; /* single column on phones */
+    }
+}
+```
