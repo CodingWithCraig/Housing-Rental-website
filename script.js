@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.navigation-page').style.display = 'none';
     document.querySelector('.rental-submissions').style.display = 'none';
     document.querySelector('.help-page').style.display = 'none';
+    document.querySelector('.view-rentals-page').style.display = 'none';
     if (document.querySelector('.verification-page')) {
         document.querySelector('.verification-page').style.display = 'none';
     }
@@ -221,7 +222,14 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.view = function() { 
-        alert("View rentals coming soon!"); 
+        document.querySelector('.login-page').style.display = 'none';
+        document.querySelector('.navigation-page').style.display = 'none';
+        document.querySelector('.rental-submissions').style.display = 'none';
+        document.querySelector('.help-page').style.display = 'none';
+        document.querySelector('.verification-page').style.display = 'none';
+        document.querySelector('.view-rentals-page').style.display = 'block';
+        
+        loadRentals();
     };
 
     window.help = function() {
@@ -230,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.rental-submissions').style.display = 'none';
         document.querySelector('.help-page').style.display = 'block';
         document.querySelector('.verification-page').style.display = 'none';
+        document.querySelector('.view-rentals-page').style.display = 'none';
     };
 
     window.addProperty = function() {
@@ -238,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.help-page').style.display = 'none';
         document.querySelector('.rental-submissions').style.display = 'block';
         document.querySelector('.verification-page').style.display = 'none';
+        document.querySelector('.view-rentals-page').style.display = 'none';
     };
 
     window.back = function() {
@@ -246,7 +256,83 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.help-page').style.display = 'none';
         document.querySelector('.navigation-page').style.display = 'block';
         document.querySelector('.verification-page').style.display = 'none';
+        document.querySelector('.view-rentals-page').style.display = 'none';
     };
+
+    window.backToNavigation = function() {
+        document.querySelector('.view-rentals-page').style.display = 'none';
+        document.querySelector('.navigation-page').style.display = 'block';
+    };
+
+    // ---------------- VIEW RENTALS FUNCTIONS ----------------
+    async function loadRentals() {
+        try {
+            const rentalsList = document.getElementById('rentalsList');
+            rentalsList.innerHTML = '<p>Loading available rentals...</p>';
+
+            // Get all properties from DynamoDB
+            const properties = await getAllPropertiesFromDynamoDB();
+            
+            if (properties.length === 0) {
+                rentalsList.innerHTML = '<p>No rentals available yet. Be the first to list a property!</p>';
+                return;
+            }
+
+            // Display properties
+            rentalsList.innerHTML = '';
+            properties.forEach(property => {
+                const rentalCard = createRentalCard(property);
+                rentalsList.appendChild(rentalCard);
+            });
+
+        } catch (error) {
+            console.error('Error loading rentals:', error);
+            document.getElementById('rentalsList').innerHTML = 
+                '<p>Error loading rentals. Please try again later.</p>';
+        }
+    }
+
+    async function getAllPropertiesFromDynamoDB() {
+        if (!AWS.config.credentials) {
+            throw new Error('AWS credentials not configured. Please login first.');
+        }
+
+        const dynamodb = new AWS.DynamoDB.DocumentClient();
+        
+        const params = {
+            TableName: 'RentalProperties'
+        };
+        
+        try {
+            const result = await dynamodb.scan(params).promise();
+            return result.Items || [];
+        } catch (error) {
+            console.error('Error fetching properties from DynamoDB:', error);
+            throw error;
+        }
+    }
+
+    function createRentalCard(property) {
+        const card = document.createElement('div');
+        card.className = 'rental-card';
+        
+        let imagesHTML = '';
+        if (property.imageUrls && property.imageUrls.length > 0) {
+            imagesHTML = `<img src="${property.imageUrls[0]}" alt="${property.location}" class="rental-image">`;
+        } else {
+            imagesHTML = '<div class="no-images">No Images Available</div>';
+        }
+        
+        card.innerHTML = `
+            ${imagesHTML}
+            <div class="rental-location">${property.location}</div>
+            <div class="rental-price">$${property.price}/month</div>
+            <div class="rental-description">${property.description}</div>
+            <div class="rental-owner">Listed by: ${property.ownerEmail}</div>
+        `;
+        
+        return card;
+    }
 
     // ---------------- STORAGE FUNCTIONS ----------------
     async function uploadImageToS3(imageFile, propertyId) {
