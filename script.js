@@ -338,59 +338,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 const propertyId = 'prop-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
                 
                 // Upload images to S3
-                const imageUrls = [];
-                for (let i = 0; i < images.length; i++) {
-                    console.log(`Uploading image ${i + 1}/${images.length}`);
-                    const imageUrl = await uploadImageToS3(images[i], propertyId);
-                    imageUrls.push(imageUrl);
-                }
-
-                // Get user email
-                const userEmail = await new Promise((resolve, reject) => {
-                    currentUser.getSession(function(err, session) {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(currentUser.getUsername());
-                        }
-                    });
-                });
-
-                // Prepare property data
-                const propertyData = {
-                    propertyId: propertyId,
-                    location: location,
-                    price: parseInt(price),
-                    description: description,
-                    imageUrls: imageUrls,
-                    ownerEmail: userEmail,
-                    createdAt: new Date().toISOString(),
-                    status: 'pending'
-                };
-
-                // Save to DynamoDB
-                await savePropertyToDynamoDB(propertyData);
-
-                alert('Property submitted successfully! ✅\nImages uploaded: ' + imageUrls.length + '\nProperty ID: ' + propertyId);
-                console.log('Property saved to AWS:', propertyData);
-                
-                // Reset form
-                rentalForm.reset();
-                
-                // Go back to navigation
-                document.querySelector('.login-page').style.display = 'none';
-                document.querySelector('.navigation-page').style.display = 'block';
-
-            } catch (error) {
-                console.error('Submission error:', error);
-                alert('Error submitting property: ' + error.message);
-            } finally {
-                // Reset button state
-                submitButton.textContent = originalText;
-                submitButton.disabled = false;
-            }
-        });
+                c    async function uploadImageToS3(imageFile, propertyId) {
+        const s3 = new AWS.S3();
+        const fileName = `properties/${propertyId}/${Date.now()}-${imageFile.name}`;
+        
+        const params = {
+            Bucket: 'rental-properties-images-craig',
+            Key: fileName,
+            Body: imageFile,
+            ContentType: imageFile.type
+            // REMOVED: ACL: 'public-read'
+        };
+        
+        try {
+            const result = await s3.upload(params).promise();
+            return result.Location;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            throw error;
+        }
     }
 
-    console.log('All functions loaded successfully!');
-});
