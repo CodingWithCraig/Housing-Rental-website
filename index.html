@@ -141,6 +141,25 @@
 </section>
 
 
+    <!-- Verification Page -->
+<section class="verification-page">
+    <div class="verification-content">
+        <h1 class="title">Verify Your Account</h1>
+        
+        <div class="verification-form">
+            <p>We sent a 6-digit verification code to your email. Please enter it below:</p>
+            
+            <input type="text" id="verificationCode" placeholder="Enter 6-digit code" required>
+            <br><br>
+            
+            <button onclick="verifyAccount()" type="button">Verify Account</button>
+            <button onclick="resendCode()" type="button" class="btn-resend">Resend Code</button>
+            <button onclick="backToLogin()" type="button" class="btn-back">Back to Login</button>
+        </div>
+    </div>
+</section>
+
+
 
 
 <script src="script.js"></script>
@@ -148,6 +167,7 @@
 </body>
 
 </html>
+
 
 
 
