@@ -84,13 +84,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const cognitoUser = result.user;
             pendingVerificationUser = cognitoUser;
             
-            // Show verification page instead of going directly to navigation
+            // Show verification page
             alert("Sign-up successful! Check your email for verification code ✅");
-            // If you added the verification page HTML, uncomment this:
-            // showVerificationPage();
-            // For now, just go to navigation
             document.querySelector('.login-page').style.display = 'none';
-            document.querySelector('.navigation-page').style.display = 'block';
+            document.querySelector('.verification-page').style.display = 'block';
         });
     };
 
@@ -145,6 +142,62 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
+    // ---------------- VERIFICATION FUNCTIONS ----------------
+    window.verifyAccount = function() {
+        const verificationCode = document.getElementById('verificationCode').value;
+        
+        if (!verificationCode) {
+            alert('Please enter the verification code from your email');
+            return;
+        }
+
+        if (!pendingVerificationUser) {
+            alert('No pending verification found. Please sign up again.');
+            document.querySelector('.verification-page').style.display = 'none';
+            document.querySelector('.login-page').style.display = 'block';
+            return;
+        }
+
+        pendingVerificationUser.confirmRegistration(verificationCode, true, function(err, result) {
+            if (err) {
+                console.error(err);
+                alert("Error: " + (err.message || JSON.stringify(err)));
+                return;
+            }
+            alert("Account verified successfully! ✅ You can now login with your email and password.");
+            document.querySelector('.verification-page').style.display = 'none';
+            document.querySelector('.login-page').style.display = 'block';
+            
+            // Clear the form
+            document.getElementById('verificationCode').value = '';
+            pendingVerificationUser = null;
+        });
+    };
+
+    window.resendCode = function() {
+        if (!pendingVerificationUser) {
+            alert('No pending verification found. Please sign up again.');
+            document.querySelector('.verification-page').style.display = 'none';
+            document.querySelector('.login-page').style.display = 'block';
+            return;
+        }
+
+        pendingVerificationUser.resendConfirmationCode(function(err, result) {
+            if (err) {
+                console.error(err);
+                alert("Error resending code: " + (err.message || JSON.stringify(err)));
+                return;
+            }
+            alert("New verification code sent to your email ✅");
+        });
+    };
+
+    window.backToLogin = function() {
+        document.querySelector('.verification-page').style.display = 'none';
+        document.querySelector('.login-page').style.display = 'block';
+        pendingVerificationUser = null;
+    };
+
     window.logout = function() {
         const currentUser = userPool.getCurrentUser();
         if (currentUser) {
@@ -176,6 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.navigation-page').style.display = 'none';
         document.querySelector('.rental-submissions').style.display = 'none';
         document.querySelector('.help-page').style.display = 'block';
+        document.querySelector('.verification-page').style.display = 'none';
     };
 
     window.addProperty = function() {
@@ -183,6 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.navigation-page').style.display = 'none';
         document.querySelector('.help-page').style.display = 'none';
         document.querySelector('.rental-submissions').style.display = 'block';
+        document.querySelector('.verification-page').style.display = 'none';
     };
 
     window.back = function() {
@@ -190,6 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.rental-submissions').style.display = 'none';
         document.querySelector('.help-page').style.display = 'none';
         document.querySelector('.navigation-page').style.display = 'block';
+        document.querySelector('.verification-page').style.display = 'none';
     };
 
     // ---------------- STORAGE FUNCTIONS ----------------
