@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fileName = `properties/${propertyId}/${Date.now()}-${imageFile.name}`;
         
         const params = {
-            Bucket: 'rental-properties-images-YOURNAME', // REPLACE WITH YOUR BUCKET NAME
+            Bucket: 'rental-properties-images-craig', // REPLACE WITH YOUR BUCKET NAME
             Key: fileName,
             Body: imageFile,
             ContentType: imageFile.type,
@@ -269,3 +269,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('All functions loaded successfully!');
 });
+
