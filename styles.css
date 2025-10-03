@@ -278,6 +278,13 @@ a {
     text-align: center;
 }
 
+.ver-background {
+    background-color: red;
+    border-radius: 20px;
+
+    
+}
+
 .btn-resend {
     background-color: #007bff;
     margin-left: 10px;
@@ -417,4 +424,5 @@ a {
     border-radius: 5px;
     margin-bottom: 10px;
 }
+
 
