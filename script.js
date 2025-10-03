@@ -21,17 +21,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize User Pool
     const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
+    // Set initial display first (show login page by default)
+    document.querySelector('.login-page').style.display = 'block';
+    document.querySelector('.navigation-page').style.display = 'none';
+    document.querySelector('.rental-submissions').style.display = 'none';
+    document.querySelector('.help-page').style.display = 'none';
+    if (document.querySelector('.verification-page')) {
+        document.querySelector('.verification-page').style.display = 'none';
+    }
+
     // Check if user is already logged in and auto-redirect
     const currentUser = userPool.getCurrentUser();
     if (currentUser) {
         currentUser.getSession(function(err, session) {
             if (err) {
                 console.log('No valid session found, showing login page');
-                showLoginPage();
+                // Already showing login page by default
             } else {
                 // User is already logged in - redirect to navigation
                 console.log('User already logged in, redirecting to navigation...');
-                showNavigationPage();
+                document.querySelector('.login-page').style.display = 'none';
+                document.querySelector('.navigation-page').style.display = 'block';
                 
                 // Configure AWS credentials for already logged-in user
                 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -42,33 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-    } else {
-        // No user logged in - show login page
-        showLoginPage();
-    }
-
-    function showLoginPage() {
-        document.querySelector('.login-page').style.display = 'block';
-        document.querySelector('.navigation-page').style.display = 'none';
-        document.querySelector('.rental-submissions').style.display = 'none';
-        document.querySelector('.help-page').style.display = 'none';
-        document.querySelector('.verification-page').style.display = 'none';
-    }
-
-    function showNavigationPage() {
-        document.querySelector('.login-page').style.display = 'none';
-        document.querySelector('.navigation-page').style.display = 'block';
-        document.querySelector('.rental-submissions').style.display = 'none';
-        document.querySelector('.help-page').style.display = 'none';
-        document.querySelector('.verification-page').style.display = 'none';
-    }
-
-    function showVerificationPage() {
-        document.querySelector('.login-page').style.display = 'none';
-        document.querySelector('.navigation-page').style.display = 'none';
-        document.querySelector('.rental-submissions').style.display = 'none';
-        document.querySelector('.help-page').style.display = 'none';
-        document.querySelector('.verification-page').style.display = 'block';
     }
 
     // Store the cognito user for verification
@@ -103,7 +86,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show verification page instead of going directly to navigation
             alert("Sign-up successful! Check your email for verification code ✅");
-            showVerificationPage();
+            // If you added the verification page HTML, uncomment this:
+            // showVerificationPage();
+            // For now, just go to navigation
+            document.querySelector('.login-page').style.display = 'none';
+            document.querySelector('.navigation-page').style.display = 'block';
         });
     };
 
@@ -148,65 +135,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     alert("Login successful ✅");
-                    showNavigationPage();
+                    document.querySelector('.login-page').style.display = 'none';
+                    document.querySelector('.navigation-page').style.display = 'block';
                 });
             },
             onFailure: function(err) {
                 alert("Error: " + (err.message || JSON.stringify(err)));
             }
         });
-    };
-
-    // ---------------- VERIFICATION FUNCTION ----------------
-    window.verifyAccount = function() {
-        const verificationCode = document.getElementById('verificationCode').value;
-        
-        if (!verificationCode) {
-            alert('Please enter the verification code from your email');
-            return;
-        }
-
-        if (!pendingVerificationUser) {
-            alert('No pending verification found. Please sign up again.');
-            showLoginPage();
-            return;
-        }
-
-        pendingVerificationUser.confirmRegistration(verificationCode, true, function(err, result) {
-            if (err) {
-                console.error(err);
-                alert("Error: " + (err.message || JSON.stringify(err)));
-                return;
-            }
-            alert("Account verified successfully! ✅ You can now login.");
-            showLoginPage();
-            
-            // Clear the form
-            document.getElementById('verificationCode').value = '';
-            pendingVerificationUser = null;
-        });
-    };
-
-    window.resendCode = function() {
-        if (!pendingVerificationUser) {
-            alert('No pending verification found. Please sign up again.');
-            showLoginPage();
-            return;
-        }
-
-        pendingVerificationUser.resendConfirmationCode(function(err, result) {
-            if (err) {
-                console.error(err);
-                alert("Error resending code: " + (err.message || JSON.stringify(err)));
-                return;
-            }
-            alert("New verification code sent to your email ✅");
-        });
-    };
-
-    window.backToLogin = function() {
-        showLoginPage();
-        pendingVerificationUser = null;
     };
 
     window.logout = function() {
@@ -218,7 +154,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         alert("You have been logged out ✅");
-        showLoginPage();
+        document.querySelector('.login-page').style.display = 'block';
+        document.querySelector('.navigation-page').style.display = 'none';
         
         // Clear the form fields
         document.querySelector('input[name="name"]').value = '';
@@ -239,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.navigation-page').style.display = 'none';
         document.querySelector('.rental-submissions').style.display = 'none';
         document.querySelector('.help-page').style.display = 'block';
-        document.querySelector('.verification-page').style.display = 'none';
     };
 
     window.addProperty = function() {
@@ -247,11 +183,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.navigation-page').style.display = 'none';
         document.querySelector('.help-page').style.display = 'none';
         document.querySelector('.rental-submissions').style.display = 'block';
-        document.querySelector('.verification-page').style.display = 'none';
     };
 
     window.back = function() {
-        showNavigationPage();
+        document.querySelector('.login-page').style.display = 'none';
+        document.querySelector('.rental-submissions').style.display = 'none';
+        document.querySelector('.help-page').style.display = 'none';
+        document.querySelector('.navigation-page').style.display = 'block';
     };
 
     // ---------------- STORAGE FUNCTIONS ----------------
@@ -325,3 +263,78 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show loading state
             const submitButton = rentalForm.querySelector('button[type="submit"]');
             const originalText = submitButton.textContent;
+            submitButton.textContent = 'Uploading...';
+            submitButton.disabled = true;
+
+            try {
+                // Get current user
+                const currentUser = userPool.getCurrentUser();
+                if (!currentUser) {
+                    throw new Error('Please login before submitting a property');
+                }
+
+                // Check if AWS credentials are ready
+                if (!AWS.config.credentials) {
+                    throw new Error('AWS permissions not ready. Please try again in a moment.');
+                }
+
+                // Generate unique property ID
+                const propertyId = 'prop-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                
+                // Upload images to S3
+                const imageUrls = [];
+                for (let i = 0; i < images.length; i++) {
+                    console.log(`Uploading image ${i + 1}/${images.length}`);
+                    const imageUrl = await uploadImageToS3(images[i], propertyId);
+                    imageUrls.push(imageUrl);
+                }
+
+                // Get user email
+                const userEmail = await new Promise((resolve, reject) => {
+                    currentUser.getSession(function(err, session) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(currentUser.getUsername());
+                        }
+                    });
+                });
+
+                // Prepare property data
+                const propertyData = {
+                    propertyId: propertyId,
+                    location: location,
+                    price: parseInt(price),
+                    description: description,
+                    imageUrls: imageUrls,
+                    ownerEmail: userEmail,
+                    createdAt: new Date().toISOString(),
+                    status: 'pending'
+                };
+
+                // Save to DynamoDB
+                await savePropertyToDynamoDB(propertyData);
+
+                alert('Property submitted successfully! ✅\nImages uploaded: ' + imageUrls.length + '\nProperty ID: ' + propertyId);
+                console.log('Property saved to AWS:', propertyData);
+                
+                // Reset form
+                rentalForm.reset();
+                
+                // Go back to navigation
+                document.querySelector('.login-page').style.display = 'none';
+                document.querySelector('.navigation-page').style.display = 'block';
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Error submitting property: ' + error.message);
+            } finally {
+                // Reset button state
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
+        });
+    }
+
+    console.log('All functions loaded successfully!');
+});
