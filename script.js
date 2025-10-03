@@ -81,17 +81,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         cognitoUser.authenticateUser(authenticationDetails, {
             onSuccess: function(result) {
-                // Configure AWS credentials after login
+                // Configure AWS credentials with Identity Pool after login
                 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                     IdentityPoolId: 'eu-north-1:29d12fad-e214-4b32-9aba-a0b7562aeb4a',
                     Logins: {
                         'cognito-idp.eu-north-1.amazonaws.com/eu-north-1_q761gVZ4i': result.getIdToken().getJwtToken()
                     }
                 });
-                
-                alert("Login successful ✅");
-                document.querySelector('.login-page').style.display = 'none';
-                document.querySelector('.navigation-page').style.display = 'block';
+
+                // Refresh credentials to apply the permissions
+                AWS.config.credentials.refresh((error) => {
+                    if (error) {
+                        console.error('Error refreshing credentials:', error);
+                        alert('Login successful but AWS permissions need configuration');
+                    } else {
+                        console.log('AWS credentials refreshed with permissions');
+                    }
+                    
+                    alert("Login successful ✅");
+                    document.querySelector('.login-page').style.display = 'none';
+                    document.querySelector('.navigation-page').style.display = 'block';
+                });
             },
             onFailure: function(err) {
                 alert("Error: " + (err.message || JSON.stringify(err)));
@@ -144,11 +154,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ---------------- STORAGE FUNCTIONS ----------------
     async function uploadImageToS3(imageFile, propertyId) {
+        // Wait for credentials to be ready
+        if (!AWS.config.credentials) {
+            throw new Error('AWS credentials not configured. Please login first.');
+        }
+
         const s3 = new AWS.S3();
         const fileName = `properties/${propertyId}/${Date.now()}-${imageFile.name}`;
         
         const params = {
-            Bucket: 'rental-properties-images-craig', // REPLACE WITH YOUR BUCKET NAME
+            Bucket: 'rental-properties-images-craig', // Your S3 bucket name
             Key: fileName,
             Body: imageFile,
             ContentType: imageFile.type,
@@ -157,14 +172,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const result = await s3.upload(params).promise();
+            console.log('Image uploaded successfully:', result.Location);
             return result.Location; // Returns the URL of uploaded image
         } catch (error) {
             console.error('Error uploading image:', error);
-            throw error;
+            throw new Error('Failed to upload image: ' + error.message);
         }
     }
 
     async function savePropertyToDynamoDB(propertyData) {
+        // Wait for credentials to be ready
+        if (!AWS.config.credentials) {
+            throw new Error('AWS credentials not configured. Please login first.');
+        }
+
         const dynamodb = new AWS.DynamoDB.DocumentClient();
         
         const params = {
@@ -174,10 +195,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             await dynamodb.put(params).promise();
+            console.log('Property saved to DynamoDB:', propertyData.propertyId);
             return true;
         } catch (error) {
             console.error('Error saving to DynamoDB:', error);
-            throw error;
+            throw new Error('Failed to save property data: ' + error.message);
         }
     }
 
@@ -211,12 +233,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error('Please login before submitting a property');
                 }
 
+                // Check if AWS credentials are ready
+                if (!AWS.config.credentials) {
+                    throw new Error('AWS permissions not ready. Please try again in a moment.');
+                }
+
                 // Generate unique property ID
                 const propertyId = 'prop-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
                 
                 // Upload images to S3
                 const imageUrls = [];
                 for (let i = 0; i < images.length; i++) {
+                    console.log(`Uploading image ${i + 1}/${images.length}`);
                     const imageUrl = await uploadImageToS3(images[i], propertyId);
                     imageUrls.push(imageUrl);
                 }
@@ -247,8 +275,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Save to DynamoDB
                 await savePropertyToDynamoDB(propertyData);
 
-                alert('Property submitted successfully! ✅\nImages uploaded: ' + imageUrls.length);
-                console.log('Property saved:', propertyData);
+                alert('Property submitted successfully! ✅\nImages uploaded: ' + imageUrls.length + '\nProperty ID: ' + propertyId);
+                console.log('Property saved to AWS:', propertyData);
                 
                 // Reset form
                 rentalForm.reset();
@@ -269,4 +297,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('All functions loaded successfully!');
 });
-
